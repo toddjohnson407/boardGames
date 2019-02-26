@@ -1,0 +1,14 @@
+{
+  "name": "boardgames",
+  "version": "1.0.0",
+  "description": "Board Games",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "toddjohnson",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}

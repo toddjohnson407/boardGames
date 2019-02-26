@@ -1,0 +1,15 @@
+
+#chess {
+  display: grid;
+  grid-template-rows: repeat(8, 100px);
+  grid-template-columns: repeat(8, 100px);
+}
+
+.chess-square {
+  height: 100px;
+  width: 100px;
+}
+
+.game-wrap {
+  margin: 50px;
+}
