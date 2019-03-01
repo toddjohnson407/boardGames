@@ -1,12 +1,19 @@
 // render games
+// import { ChessPiece } from './src/ChessPiece.js';
 
 var chessBoard = document.getElementById('chess');
 var motionActive = false;
 var boardSquares = [];
+var borderRows = [];
+var topBorder = [];
+var bottomBorder = [];
+var rightBorder = [];
+var leftBorder = [];
 var possibleMoves = [];
 var rows = [];
 var cols = [];
 var previousMovePiece;
+var playerSelect = 'white';
 
 var resetSelectionOptions = function() {
   var squareSet = document.getElementsByClassName('chess-square');
@@ -16,35 +23,66 @@ var resetSelectionOptions = function() {
 }
 
 var moveHere = function(newLocation, movingPiece, possibleMoves, playerSwitch, pawnsFirst) {
-  if (parseInt(newLocation.id) != parseInt(movingPiece.parentNode.id)) {
-    if (parseInt(newLocation.id) - parseInt(movingPiece.parentNode.id) == playerSwitch * 2 && pawnsFirst) {
-      movingPiece.className = 'pawn';
-      console.log('oh');
-      console.log(pawnsFirst);
+  if (parseInt(newLocation.id, 10) != parseInt(movingPiece.parentNode.id, 10) && playerSelect == movingPiece.style.backgroundColor) {
+    if (newLocation.firstChild == null || newLocation.firstChild.style.backgroundColor != playerSelect) {
+      playerSelect = (playerSelect == 'white') ? 'black' : 'white';
+
+      if (movingPiece.className == 'pawn unmoved') {
+        movingPiece.className = 'pawn';
+      }
+      if (newLocation.firstChild == null) {
+        movingPiece.parentNode.onclick = null;
+        newLocation.appendChild(movingPiece);
+      }
+      if (newLocation.id != possibleMoves[0]) {
+        movingPiece.parentNode.onclick = null;
+        newLocation.removeChild(newLocation.firstChild);
+        newLocation.appendChild(movingPiece);
+      }
+      movingPiece.style.border = 'none';
+      resetSelectionOptions();
     }
-    if (newLocation.firstChild == null) {
-      movingPiece.parentNode.onclick = null;
-      newLocation.appendChild(movingPiece);
-      movingPiece.className = 'pawn';
-    }
-    if (newLocation.id != possibleMoves[0]) {
-      movingPiece.parentNode.onclick = null;
-      newLocation.removeChild(newLocation.firstChild);
-      newLocation.appendChild(movingPiece);
-      movingPiece.className = 'pawn';
+  }
+}
+
+var checkBorders = function(pieceLocation, type) {
+  if (borderRows.includes(pieceLocation) || type != 'pawn') {
+    if (leftBorder.includes(pieceLocation)) {
+      return 'left';
+    } else if (rightBorder.includes(pieceLocation)) {
+      return 'right';
+    } else if (leftBorder.includes(pieceLocation - 1) && type != 'pawn' && type != 'pawn unmoved') {
+      return 'LEFTTT';
+    } else {
+      return 'none';
     }
   }
 }
 
 var checkDiagonal = function(pawnLocation, player, playerSwitch) {
   var diagonalPawns = [];
+  var availableMoves;
+  var borderLimit = checkBorders(pawnLocation, 'pawn');
 
   for (var i = -1; i < 2; i++) {
+
     var diagonalPawn = document.getElementById(pawnLocation + i + playerSwitch);
 
-    if (diagonalPawn.firstChild != null && i != 0) {
-      if (diagonalPawn.firstChild.style.backgroundColor != player) {
-        diagonalPawns.push(parseInt(diagonalPawn.id, 10));
+    if (diagonalPawn != null) {
+      if (diagonalPawn.firstChild != null && i != 0) {
+        if (diagonalPawn.firstChild.style.backgroundColor != player) {
+          if (borderLimit == 'left') {
+            if (i != -1) {
+              diagonalPawns.push(parseInt(diagonalPawn.id, 10));
+            }
+          } else if (borderLimit == 'right') {
+            if (i != 1) {
+              diagonalPawns.push(parseInt(diagonalPawn.id, 10));
+            }
+          } else {
+            diagonalPawns.push(parseInt(diagonalPawn.id, 10));
+          }
+        }
       }
     }
   }
@@ -58,6 +96,7 @@ var determinePawnMoves = function(selectedPawn) {
   var pawnsFirst = false;
   var defaultMoves = [];
   var diagonalMoves = [];
+  var diagonal;
   var startMove;
   possibleMoves = [];
 
@@ -71,12 +110,50 @@ var determinePawnMoves = function(selectedPawn) {
   diagonalMoves = checkDiagonal(pawnLocation, player, playerSwitch);
   possibleMoves = defaultMoves.concat(diagonalMoves);
 
-  console.log(possibleMoves);
-
   for (var i = 0; i < possibleMoves.length; i++) {
-    moveOption = document.getElementById(possibleMoves[i]);
-    moveOption.onclick = function() { moveHere(this, selectedPawn, possibleMoves, playerSwitch, pawnsFirst); }
+    if (selectedPawn.style.backgroundColor == playerSelect) {
+      moveOption = document.getElementById(possibleMoves[i]);
+      moveOption.onclick = function() { moveHere(this, selectedPawn, possibleMoves, playerSwitch, pawnsFirst); }
+    }
   }
+
+}
+
+var determineKnightMoves = function(selectedKnight) {
+  var knightLocation = parseInt(selectedKnight.parentNode.id, 10);
+  var player = selectedKnight.style.backgroundColor;
+  var playerSwitch = (player == 'black') ? 8 : -8;
+  var possibleKnightMoves = [];
+  var borderLimit = checkBorders(knightLocation, 'knight');
+
+  switch (borderLimit) {
+    case 'left':
+      console.log('l');
+
+      break;
+    case 'right':
+      console.log('r');
+      break;
+  }
+  possibleKnightMoves.push(knightLocation + 15, knightLocation + 17, knightLocation - 15, knightLocation + - 17, knightLocation + 10, knightLocation + 6, knightLocation - 10, knightLocation - 6);
+  console.log(possibleKnightMoves);
+  for (var i = 0; i < 8; i++) {
+    moveOption = document.getElementById(possibleKnightMoves[i]);
+    if (moveOption != null) {
+      moveOption.onclick = function() { moveHere(this, selectedKnight, possibleKnightMoves, playerSwitch, false)}
+    }
+  }
+}
+var determineRookMoves = function() {
+
+}
+var determineBishopMoves = function() {
+
+}
+var determineQueenMoves = function() {
+
+}
+var determineKingMoves = function() {
 
 }
 
@@ -88,21 +165,42 @@ var determinePossibleMoves = function(pieceType) {
 
   switch (pieceName) {
     case 'pawn':
+      determinePawnMoves(pieceType);
+      break;
     case 'pawn unmoved':
       determinePawnMoves(pieceType);
+      break;
+    case 'knight':
+      determineKnightMoves(pieceType);
+      break;
+    case 'rook':
+      determineRookMoves(pieceType);
+      break;
+    case 'bishop':
+      determineBishopMoves(pieceType);
+      break;
+    case 'queen':
+      determineQueenMoves(pieceType);
+      break;
+    case 'king':
+      determineKingMoves(pieceType);
+      break;
   }
 }
 
 var selectPiece = function(mainPiece) {
-  mainPiece.style.border = 'solid 3px blue';
-
-  if (previousMovePiece != undefined) {
-    previousMovePiece.style.border = 'none';
-  }
-  previousMovePiece = mainPiece;
-
   resetSelectionOptions();
-  determinePossibleMoves(mainPiece);
+  console.log(playerSelect);
+  if (mainPiece.style.backgroundColor == playerSelect) {
+    mainPiece.style.border = 'solid 3px blue';
+
+    if (previousMovePiece != undefined && previousMovePiece != mainPiece) {
+      previousMovePiece.style.border = 'none';
+    }
+
+    previousMovePiece = mainPiece;
+    determinePossibleMoves(mainPiece);
+  }
 }
 
 var createMainPieces = function() {
@@ -182,13 +280,22 @@ var createPawns = function() {
 
 var assignBorderSquares = function() {
   var squares = document.getElementsByClassName('chess-square');
-  var borderRows = rows[0].concat(rows[7]);
-  for (var i = 1; i < 7; i++) {
-    var square = squares[(8 * i)];
-    var squareNum = parseInt(square.id, 10);
-    borderRows.push(squareNum);
+  borderRows = rows[0].concat(rows[7]);
+  var startColPoints = [0, 7];
+  for (var q = 0; q < 2; q++) {
+    for (var i = 1; i < 7; i++) {
+      var square = squares[(8 * i) + startColPoints[q]];
+      var squareNum = parseInt(square.id, 10);
+      borderRows.push(squareNum);
+    }
   }
-  console.log(borderRows);
+
+  topBorder = rows[0];
+  bottomBorder = rows[7];
+  leftBorder = borderRows.slice(16, 22);
+  leftBorder.push(borderRows[0], borderRows[8])
+  rightBorder = borderRows.slice(22, 28);
+  rightBorder.push(borderRows[7], borderRows[15]);
 }
 
 var createBoard = function() {
