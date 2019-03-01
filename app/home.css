@@ -1,15 +1,68 @@
 
 #chess {
   display: grid;
-  grid-template-rows: repeat(8, 100px);
-  grid-template-columns: repeat(8, 100px);
+  width: 720px;
+  border: 8px solid black;
+  grid-template-rows: repeat(8, 90px);
+  grid-template-columns: repeat(8, 90px);
 }
 
 .chess-square {
-  height: 100px;
-  width: 100px;
+  height: 90px;
+  width: 90px;
+  display: grid;
+  justify-items: center;
+  align-items: center;
 }
 
 .game-wrap {
-  margin: 50px;
+  display: grid;
+  justify-items: center;
+  margin: 45px;
+}
+
+.pawn {
+  color: inherit;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  justify-items: center;
+  align-items: center;
+}
+
+.p {
+  font-size: 20px;
+}
+
+.king {
+  color: inherit;
+  font-size: 20px;
+}
+
+.queen {
+  color: inherit;
+  font-size: 20px;
+}
+
+.bishop {
+  color: inherit;
+  font-size: 20px;
+}
+
+.knight {
+  color: inherit;
+  font-size: 20px;
+}
+
+.rook {
+  color: inherit;
+  font-size: 20px;
+}
+
+.main-piece {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  justify-items: center;
+  align-items: center;
 }
